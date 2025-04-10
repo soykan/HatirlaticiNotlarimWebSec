@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>OS Command Injection</title>
+        <style>
+            .mainDiv {
+                border:2px solid black; 
+                padding:7px; 
+                text-align:center;
+                display:inline-block;
+                margin-top: 10px;
+            }
+
+            .ipAddressInput {
+                margin-top:7px;
+            }
+
+            .submitButton {
+                margin-top:7px;
+            }
+        </style>
+    </head>
+    <body>
+        <center>
+            <div class="mainDiv">
+                <h3>Ping Utility for Troubleshoot</h3>
+                <form method="POST" action="/">
+                    <label>IP Address:</label><br/>
+                    <input type="text" name="ipAddress" placeholder="8.8.8.8" class="ipAddressInput" /><br/>
+                    <input type="submit" value="Send" class="submitButton" /><br/>
+                </form>
+                {% if result %}
+                <div class="mainDiv">
+                    {% for line in result %}
+                        <p>{{ line }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </center>
+    </body>
+</html>
