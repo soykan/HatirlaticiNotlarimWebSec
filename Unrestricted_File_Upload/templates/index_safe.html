@@ -1,0 +1,32 @@
+<!-- UNDER CONSTRUCTION -->
+
+<html>
+    <head>
+        <title>Unrestricted File Upload</title>
+    </head>
+    <body>
+        <h3>File Upload</h3>
+
+        <div>
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <!-- CSRF TOKEN line  -->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><br/> <!-- #####  -->
+                <input type="file" name="fileInput" /><br/>
+                <input type="submit" value="Upload" /><br/>
+            </form>
+        </div>
+
+        {% if error %}
+            <div>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+
+        {% if upload_path %}
+            <div>
+                <p>{{ upload_path }}</p>
+            </div>
+        {% endif %}
+    </body>
+</html>

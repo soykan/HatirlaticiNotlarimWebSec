@@ -13,9 +13,6 @@ def mainPage():
         cwd = os.getcwd()
         save_path = cwd + '/' + file.filename
         file.save(save_path)
-        '''
-        Kalınan nokta.
-        '''
         return render_template('index.html', upload_path=save_path)
     else:
         return redirect('/', code=405)
