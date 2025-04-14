@@ -1,8 +1,3 @@
-######################
-# UNDER CONSTRUCTION #
-######################
-
-
 import os
 import random
 import string
@@ -70,7 +65,6 @@ def mainPage():
         file.save(save_path)
         
         return redirect('/images/' + filename)
-        #return render_template('index_safe.html', upload_path=save_path)
     else:
         return redirect('/', code=405)
 
@@ -91,7 +85,7 @@ def ext_check(filename):
 def filename_generator(extension):
     rand_file_name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
     return rand_file_name + '.' + extension
-    # Alternative olarak secure_filename()
+    # Alternatif olarak secure_filename()
     # https://werkzeug.palletsprojects.com/en/stable/utils/#werkzeug.utils.secure_filename
 
 
