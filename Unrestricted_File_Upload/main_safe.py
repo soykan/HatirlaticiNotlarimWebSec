@@ -9,7 +9,6 @@ import string
 
 from flask import Flask, request, render_template, redirect
 
-# CSRF Protection
 from flask_wtf.csrf import CSRFProtect
 
 import magic
@@ -20,22 +19,16 @@ app = Flask(__name__, instance_relative_config=True)
 # SECRET KEY required for CSRF protection mechanism
 app.config.from_mapping(SECRET_KEY='192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf') # https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY
 
-# Max file size 8 Megabyte (Looks like that doesn't affected by a changed Content-Length header)
-
-#   --------------------
-#   --- TRY TO BYPASS --
-app.config['MAX_CONTENT_LENGTH'] = 8 * 1000 * 1000 #   --- TRY TO BYPASS --
-#   --- TRY TO BYPASS --
-#   --------------------
-
+# Max file size 16 Megabyte (That doesn't affected by a changed Content-Length header)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000 
 
 # CSRF Protection initalize
 csrf = CSRFProtect(app) # -----
 
 
-#### UPLOAD_FOLDER = '/path/to/the/uploads'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 ALLOWED_FILE_TYPES = {'image/jpeg', 'image/jpg', 'image/png'}
+
 
 @app.route('/', methods=['GET', 'POST'])
 def mainPage():
@@ -45,15 +38,12 @@ def mainPage():
         file = request.files['fileInput']
         is_allowed_ext = ext_check(file.filename)
         if not is_allowed_ext:
-            #
-            #   LOGGING MECHANISM MUST BE IMPLEMENTED HERE
-            #
             extension_error = 'Valid file extension types are' + str([ext for ext in ALLOWED_EXTENSIONS])
             return render_template('index_safe.html', error=extension_error)
 
 
         if not file_type_check(file):
-            file_type_error = 'File type does not match with any of these:' + str([ext for ext in ALLOWED_FILE_TYPES])
+            file_type_error = 'File type does not match with any of these:' + str([type_of_file for type_of_file in ALLOWED_FILE_TYPES])
             return render_template('index_safe.html', error=file_type_error)
 
 
@@ -63,20 +53,17 @@ def mainPage():
         except FileExistsError:
             pass
         filename = filename_generator()
-        save_path = cwd + '/files/' +  filename
+        save_path = cwd + '/files/' +  filename # You may want to change the path instead of storing them in files directory 
         while os.path.exists(save_path):
             save_path = cwd + '/files/' + filename_generator()
 
-        #
-        # -- Store the files on a different server. If that's not possible, store them outside of the webroot --
-        # Yeniden gözden geçirilecek
-        #        
         file.stream.seek(0) # Kaynak: https://github.com/pallets/werkzeug/issues/1666
         file.save(save_path)
 
         return render_template('index_safe.html', upload_path=save_path)
     else:
         return redirect('/', code=405)
+
 
 def ext_check(filename):
     ext_start_index = filename.rindex('.') + 1
@@ -86,8 +73,6 @@ def ext_check(filename):
     else:
         return False
 
-def input_validation():
-    pass
 
 def filename_generator():
     rand_file_name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
@@ -95,22 +80,16 @@ def filename_generator():
     # Alternative olarak secure_filename()
     # https://werkzeug.palletsprojects.com/en/stable/utils/#werkzeug.utils.secure_filename
 
+
 def file_type_check(file):
     file_type = magic.from_buffer(file.read(), mime=True)
     if file_type in ALLOWED_FILE_TYPES:
         return True
     return False
-        
 
 
-'''
-[ + ]   CSRF Protection
-[ | ]   ext check     (LOGGING MECHANISM NEEDED)
-[ + ]   filename generator
-[   ]   validate the file type
-[ | ]   file size limit check (NEED TO TRY TO BYPASS TO CHECK IF SECURE APPROACH OR NOT)
-[ | ]   store files outside of the webroot
-'''
+# [  ] In the case of public access to the files, use a handler that gets mapped to filenames inside the application (someid -> file.ext)
+
 
 
 '''
