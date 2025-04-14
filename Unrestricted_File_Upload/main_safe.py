@@ -7,7 +7,7 @@ import os
 import random
 import string
 
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, send_from_directory
 
 from flask_wtf.csrf import CSRFProtect
 
@@ -15,6 +15,8 @@ import magic
 
 
 app = Flask(__name__, instance_relative_config=True)
+
+app.config['UPLOAD_FOLDER'] = os.getcwd() + '/files/' # You may want to change the path instead of storing them in files directory 
 
 # SECRET KEY required for CSRF protection mechanism
 app.config.from_mapping(SECRET_KEY='192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf') # https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY
@@ -28,6 +30,11 @@ csrf = CSRFProtect(app) # -----
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 ALLOWED_FILE_TYPES = {'image/jpeg', 'image/jpg', 'image/png'}
+
+@app.route('/images/<name>', methods=['GET'])
+def imageViewPage(name):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], name)
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -52,31 +59,38 @@ def mainPage():
             os.mkdir(cwd + '/files')
         except FileExistsError:
             pass
-        filename = filename_generator()
-        save_path = cwd + '/files/' +  filename # You may want to change the path instead of storing them in files directory 
+        extension_of_file = get_extension(file.filename)
+        filename = filename_generator(extension_of_file)
+        save_path = app.config['UPLOAD_FOLDER'] + filename
         while os.path.exists(save_path):
-            save_path = cwd + '/files/' + filename_generator()
+            filename = filename_generator(extension_of_file)
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
         file.stream.seek(0) # Kaynak: https://github.com/pallets/werkzeug/issues/1666
         file.save(save_path)
-
-        return render_template('index_safe.html', upload_path=save_path)
+        
+        return redirect('/images/' + filename)
+        #return render_template('index_safe.html', upload_path=save_path)
     else:
         return redirect('/', code=405)
 
 
-def ext_check(filename):
+def get_extension(filename):
     ext_start_index = filename.rindex('.') + 1
     extension = filename[ext_start_index:]
+    return extension 
+
+def ext_check(filename):
+    extension = get_extension(filename)
     if extension in ALLOWED_EXTENSIONS:
         return True
     else:
         return False
 
 
-def filename_generator():
+def filename_generator(extension):
     rand_file_name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-    return rand_file_name
+    return rand_file_name + '.' + extension
     # Alternative olarak secure_filename()
     # https://werkzeug.palletsprojects.com/en/stable/utils/#werkzeug.utils.secure_filename
 
@@ -87,8 +101,6 @@ def file_type_check(file):
         return True
     return False
 
-
-# [  ] In the case of public access to the files, use a handler that gets mapped to filenames inside the application (someid -> file.ext)
 
 
 
