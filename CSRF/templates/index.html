@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>CSRF</title>
+    </head>
+    <body>
+        <h3>Change your password</h3>
+        <form action="/" method="POST">
+            <input type="password" name="password1" /><br/>
+            <input type="password" name="password2" /><br/>
+            <input type="submit" value="Change Password"/><br/>
+        </form>
+        {% if result %}
+            <p>{{ result }}</p>
+        {% endif %}
+    </body>
+
+</html>
