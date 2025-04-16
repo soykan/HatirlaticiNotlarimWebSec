@@ -11,7 +11,6 @@ def main():
         p1 = request.form['password1']
         p2 = request.form['password2']
         if p1 == p2:
-            print(p1)
             r = make_response(render_template('index.html', result='Password changed.'))
             r.headers.set('Access-Control-Allow-Origin', "*")
             return r

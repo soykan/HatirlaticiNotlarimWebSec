@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>CSRF</title>
+    </head>
+    <body>
+        <h3>Change your password</h3>
+        <form action="/" method="POST">
+            <!-- CSRF TOKEN line  -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><br/>
+
+            <!-- 
+                The below line (which asking for current password) is not only an additional security layer to protect account from CSRF attacks,
+                it also prevents if an attacker who steal the session become fully owner of the target account
+            -->
+            <input type="password" name="currentPassword" placeholder="Current password"/><br/> 
+
+            <input type="password" name="password1" placeholder="Type new password" /><br/>
+            <input type="password" name="password2" placeholder="Type same again" /><br/>
+            <input type="submit" value="Change Password"/><br/>
+        </form>
+        {% if result %}
+            <p>{{ result }}</p>
+        {% endif %}
+    </body>
+
+</html>

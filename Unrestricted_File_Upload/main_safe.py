@@ -20,7 +20,7 @@ app.config.from_mapping(SECRET_KEY='192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bb
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000 
 
 # CSRF Protection initalize
-csrf = CSRFProtect(app) # -----
+csrf = CSRFProtect(app)
 
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
