@@ -1,0 +1,1 @@
+rather then those in current folder will contain csrf+xss example
