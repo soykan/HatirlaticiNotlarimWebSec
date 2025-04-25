@@ -1,1 +1,0 @@
-curl -d '{"password1":"1337", "password2":"1337"}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5000/api/v1/change-password
